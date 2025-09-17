@@ -21,6 +21,16 @@ export default function Labs() {
         <Link href="/" id="wd-kambaz-link">
         Kambaz</Link>
         </li>
+        <li>
+          <a
+            href="https://github.com/zayyarmin1688/kambaz-next-js"
+            id="wd-github"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+        </li>
      </ul>
    </div>
 );}
