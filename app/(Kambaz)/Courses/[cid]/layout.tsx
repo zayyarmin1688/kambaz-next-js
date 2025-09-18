@@ -1,13 +1,14 @@
 import { ReactNode } from "react";
 import CourseNavigation from "./Navigation";
 
-type LayoutProps = {
+type LayoutProps = Readonly<{
   children: ReactNode;
-  params: { cid: string };
-};
+  // NOTE: params is a Promise in this handout/Next version
+  params: Promise<{ cid: string }>;
+}>;
 
-export default function CoursesLayout({ children, params }: LayoutProps) {
-  const { cid } = params;
+export default async function CoursesLayout({ children, params }: LayoutProps) {
+  const { cid } = await params;
 
   return (
     <div id="wd-courses">
@@ -16,12 +17,15 @@ export default function CoursesLayout({ children, params }: LayoutProps) {
       <table>
         <tbody>
           <tr>
-            <td valign="top" width="200"><CourseNavigation /></td>
-            <td valign="top" width="100%">{children}</td>
+            <td valign="top" width="200">
+              <CourseNavigation />
+            </td>
+            <td valign="top" width="100%">
+              {children}
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
   );
 }
-
