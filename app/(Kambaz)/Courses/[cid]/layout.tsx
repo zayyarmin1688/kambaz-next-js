@@ -3,7 +3,6 @@ import CourseNavigation from "./Navigation";
 
 type LayoutProps = Readonly<{
   children: ReactNode;
-  // NOTE: params is a Promise in this handout/Next version
   params: Promise<{ cid: string }>;
 }>;
 
@@ -14,10 +13,15 @@ export default async function CoursesLayout({ children, params }: LayoutProps) {
     <div id="wd-courses">
       <h2>Courses {cid}</h2>
       <hr />
-      <table>
+
+      <table className="w-100">
         <tbody>
           <tr>
-            <td valign="top" width="200">
+            <td
+              valign="top"
+              width="200"
+              className="d-none d-md-table-cell pe-3"
+            >
               <CourseNavigation />
             </td>
             <td valign="top" width="100%">
