@@ -38,7 +38,7 @@ export default function Float() {
         />
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius hic ipsam consequatur saepe, laudantium quam quasi quae perspiciatis quo maxime error tenetur repudiandae necessitatibus veritatis obcaecati quisquam at itaque?
         <br />
-         Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius hic ipsam consequatur saepe, laudantium quam quasi quae perspiciatis quo maxime error tenetur repudiandae necessitatibus veritatis obcaecati quisquam at itaque?
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius hic ipsam consequatur saepe, laudantium quam quasi quae perspiciatis quo maxime error tenetur repudiandae necessitatibus veritatis obcaecati quisquam at itaque?
         <div className="wd-float-done"></div>
       </div>
 
