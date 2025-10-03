@@ -19,7 +19,7 @@ type NavEntry = {
 const NAV: NavEntry[] = [
   { id: "account",   href: "/Account",   label: "Account",   Icon: FaRegCircleUser },
   { id: "dashboard", href: "/Dashboard", label: "Dashboard", Icon: AiOutlineDashboard },
-  { id: "courses",   href: "/Dashboard", label: "Courses",   Icon: FaBook },
+  { id: "courses",   href: "/Courses", label: "Courses",   Icon: FaBook },
   { id: "calendar",  href: "/Calendar",  label: "Calendar",  Icon: IoCalendarOutline },
   { id: "inbox",     href: "/Inbox",     label: "Inbox",     Icon: FaInbox },
   { id: "labs",      href: "/Labs",      label: "Labs",      Icon: FaFlask },
