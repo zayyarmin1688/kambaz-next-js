@@ -36,7 +36,6 @@ export default function Assignments() {
           </span>
         </ListGroupItem>
 
-        {/* Assignment 1 */}
         <ListGroupItem className="d-flex justify-content-between align-items-center border-start border-end border-bottom">
           <div>
             <Link href="/Courses/1234/Assignments/123" className="fw-bold text-primary">
@@ -53,7 +52,6 @@ export default function Assignments() {
           </div>
         </ListGroupItem>
 
-        {/* Assignment 2 */}
         <ListGroupItem className="d-flex justify-content-between align-items-center border-start border-end border-bottom">
           <div>
             <Link href="/Courses/1234/Assignments/124" className="fw-bold text-primary">
@@ -70,7 +68,6 @@ export default function Assignments() {
           </div>
         </ListGroupItem>
 
-        {/* Assignment 3 */}
         <ListGroupItem className="d-flex justify-content-between align-items-center border-start border-end border-bottom">
           <div>
             <Link href="/Courses/1234/Assignments/125" className="fw-bold text-primary">

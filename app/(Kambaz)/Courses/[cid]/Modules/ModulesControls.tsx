@@ -4,7 +4,6 @@ import { Button, Dropdown, DropdownMenu, DropdownToggle, DropdownItem } from "re
 import { FaPlus } from "react-icons/fa6";
 import GreenCheckmark from "./GreenCheckmark";
 
-/** Matches the screenshots: Collapse All | View Progress | Publish All ▼ | + Module */
 export default function ModulesControls() {
   return (
     <div id="wd-modules-controls" className="text-nowrap">
@@ -21,11 +20,9 @@ export default function ModulesControls() {
           <DropdownItem id="wd-publish-all"> <GreenCheckmark /> Publish All</DropdownItem>
           <DropdownItem id="wd-publish-all-modules-and-items"> <GreenCheckmark /> Publish all modules and items</DropdownItem>
           <DropdownItem id="wd-publish-modules-only"> <GreenCheckmark /> Publish modules only</DropdownItem>
-          {/* Add the two "Unpublish ..." menu items later if needed */}
         </DropdownMenu>
       </Dropdown>
 
-      {/* Stubs for the other two buttons (add IDs so TAs can find them) */}
       <Button id="wd-view-progress" className="me-2" variant="outline-secondary">View Progress</Button>
       <Button id="wd-collapse-all" className="me-2" variant="outline-secondary">Collapse All</Button>
     </div>

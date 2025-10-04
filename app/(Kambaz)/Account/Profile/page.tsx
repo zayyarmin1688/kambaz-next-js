@@ -37,8 +37,6 @@ export default function Profile() {
           placeholder="Last Name"
           defaultValue="Wonderland"
         />
-
-        {/* Date: leave empty to show placeholder like the spec */}
         <FormControl
           id="wd-dob"
           className="mb-2"
@@ -61,7 +59,6 @@ export default function Profile() {
           <option value="STUDENT">Student</option>
         </Form.Select>
 
-        {/* Full-width red button like the screenshot */}
         <Link href="/Account/Signin" className="btn btn-danger w-100">
           Signout
         </Link>

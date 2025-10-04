@@ -56,7 +56,6 @@ export default function Modules() {
 
       <br />
 
-      {/* WEEK 1 */}
       <ListGroup className="rounded-0 mb-5 border-gray">
         <ListGroupItem className="d-flex justify-content-between align-items-center bg-secondary text-dark">
           <div className="fw-semibold">Week 1</div>
@@ -77,7 +76,6 @@ export default function Modules() {
         </ListGroupItem>
       </ListGroup>
 
-      {/* WEEK 2 */}
       <ListGroup className="rounded-0 mb-5 border-gray">
         <ListGroupItem className="d-flex justify-content-between align-items-center bg-secondary text-dark">
           <div className="fw-semibold">Week 2</div>
@@ -111,7 +109,6 @@ export default function Modules() {
         </ListGroupItem>
       </ListGroup>
 
-      {/* WEEK 3 */}
       <ListGroup className="rounded-0 mb-5 border-gray">
         <ListGroupItem className="d-flex justify-content-between align-items-center bg-secondary text-dark">
           <div className="fw-semibold">Week 3</div>
@@ -145,7 +142,6 @@ export default function Modules() {
         </ListGroupItem>
       </ListGroup>
 
-      {/* WEEK 4 */}
       <ListGroup className="rounded-0 mb-5 border-gray">
         <ListGroupItem className="d-flex justify-content-between align-items-center bg-secondary text-dark">
           <div className="fw-semibold">Week 4</div>

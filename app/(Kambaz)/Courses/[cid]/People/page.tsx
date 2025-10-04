@@ -18,7 +18,6 @@ export default function People() {
           </tr>
         </thead>
         <tbody>
-          {/* Tony Stark */}
           <tr>
             <td className="wd-full-name text-nowrap">
               <FaUserCircle className="me-2 fs-4 text-secondary" />
@@ -31,8 +30,6 @@ export default function People() {
             <td className="wd-last-activity">2020-10-01T00:00:00.000Z</td>
             <td className="wd-total-activity">10:21:32</td>
           </tr>
-
-          {/* Bruce Wayne */}
           <tr>
             <td className="text-nowrap">
               <FaUserCircle className="me-2 fs-4 text-secondary" />
@@ -45,7 +42,7 @@ export default function People() {
             <td>15:32:43</td>
           </tr>
 
-          {/* Steve Rogers */}
+
           <tr>
             <td className="text-nowrap">
               <FaUserCircle className="me-2 fs-4 text-secondary" />
@@ -58,7 +55,7 @@ export default function People() {
             <td>23:32:43</td>
           </tr>
 
-          {/* Natasha Romanoff (TA) */}
+
           <tr>
             <td className="text-nowrap">
               <FaUserCircle className="me-2 fs-4 text-secondary" />
@@ -71,7 +68,7 @@ export default function People() {
             <td>13:23:34</td>
           </tr>
 
-          {/* Thor Odinson */}
+
           <tr>
             <td className="text-nowrap">
               <FaUserCircle className="me-2 fs-4 text-secondary" />
@@ -84,7 +81,7 @@ export default function People() {
             <td>11:22:33</td>
           </tr>
 
-          {/* Bruce Banner */}
+
           <tr>
             <td className="text-nowrap">
               <FaUserCircle className="me-2 fs-4 text-secondary" />

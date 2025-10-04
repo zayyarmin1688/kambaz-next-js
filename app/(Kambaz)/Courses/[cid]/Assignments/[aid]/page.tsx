@@ -17,12 +17,12 @@ export default function AssignmentEditor() {
             rows={5}
             defaultValue={`The assignment is available online. Submit a link to the landing page of your Web application running on Netlify.
 
-The landing page should include the following:
-• Your full name and section
-• Links to each of the lab assignments
-• Link to the Kanbas application
-• Links to all relevant source code repositories
-• The Kanbas application should include a link back to the landing page.`}
+                            The landing page should include the following:
+                            • Your full name and section
+                            • Links to each of the lab assignments
+                            • Link to the Kanbas application
+                            • Links to all relevant source code repositories
+                            • The Kanbas application should include a link back to the landing page.`}
           />
         </Form.Group>
 
