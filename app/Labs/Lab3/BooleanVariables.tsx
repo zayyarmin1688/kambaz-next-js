@@ -1,18 +1,18 @@
 export default function BooleanVariables() {
-  let numberVariable = 123,
-    floatingPointNumber = 234.345;
+  const numberVariable = 123,
+    floatingPointNumber = 234.345 as number; // had to add "as number" because vscode wouldn't stop yelling at me.
 
-  let true1 = true,
+  const true1 = true,
     false1 = false;
 
-  let false2 = true1 && false1;
-  let true2 = true1 || false1;
-  let true3 = !false2;
+  const false2 = true1 && false1;
+  const true2 = true1 || false1;
+  const true3 = !false2;
 
-  let true4 = numberVariable === 123; // always use === not ==
-  let true5 = floatingPointNumber !== 321.432;
+  const true4 = numberVariable === 123;
+  const true5 = floatingPointNumber !== 321.432;
 
-  let false3 = numberVariable < 100;
+  const false3 = numberVariable < 100;
 
   return (
     <div id="wd-boolean-variables">
