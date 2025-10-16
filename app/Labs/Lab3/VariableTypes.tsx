@@ -1,23 +1,25 @@
 export default function VariableTypes() {
-  let numberVariable = 123;
-  let floatingPointNumber = 234.345;
-  let stringVariable = 'Hello World!';
-  let booleanVariable = true;
+  const numberVariable: number = 123;
+  const floatingPointNumber: number = 3.14159;
+  const stringVariable: string = "Hello";
+  const booleanVariable: boolean = true;
 
-  let isNumber = typeof numberVariable;
-  let isString = typeof stringVariable;
-  let isBoolean = typeof booleanVariable;
+  const isNumber = typeof numberVariable === "number";
+  const isString = typeof stringVariable === "string";
+  const isBoolean = typeof booleanVariable === "boolean";
 
   return (
     <div id="wd-variable-types">
-      <h4>Variables Types</h4>
-      numberVariable = {numberVariable} <br />
-      floatingPointNumber = {floatingPointNumber} <br />
-      stringVariable = {stringVariable} <br />
-      booleanVariable = {booleanVariable + ''} <br />
-      isNumber = {isNumber} <br />
-      isString = {isString} <br />
-      isBoolean = {isBoolean} <hr />
+      <h4>Variable Types</h4>
+      <div>numberVariable = {numberVariable}</div>
+      <div>floatingPointNumber = {floatingPointNumber}</div>
+      <div>stringVariable = {stringVariable}</div>
+      <div>booleanVariable = {String(booleanVariable)}</div>
+      <hr />
+      <div>isNumber = {String(isNumber)}</div>
+      <div>isString = {String(isString)}</div>
+      <div>isBoolean = {String(isBoolean)}</div>
     </div>
   );
 }
+
