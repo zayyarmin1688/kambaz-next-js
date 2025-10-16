@@ -1,40 +1,72 @@
 "use client";
 
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Form, Button, Row, Col } from "react-bootstrap";
+import * as db from "../../../../Database";
+
+type Assignment = {
+  _id: string;
+  course: string;   
+  title: string;
+  description?: string;
+  points?: number;
+  availableFrom?: string;
+  availableUntil?: string; 
+  due?: string; 
+};
 
 export default function AssignmentEditor() {
+  const { cid, aid } = useParams<{ cid: string; aid: string }>();
+
+  const assignment = (db.assignments as Assignment[]).find(
+    (a) => a.course === cid && a._id === aid
+  );
+
+  const title = assignment?.title ?? "Untitled Assignment";
+  const description =
+    assignment?.description ??
+    `The assignment is available online.
+
+The landing page should include:
+• Your full name and section
+• Links to each of the lab assignments
+• Link to the Kanbas application
+• Links to all relevant source code repositories
+• The Kanbas application should include a link back to the landing page.`;
+
+  const points = assignment?.points ?? 100;
+  const due = assignment?.due ?? "2024-05-13T23:59";
+  const availFrom = assignment?.availableFrom ?? "2024-05-06";
+  const availUntil = assignment?.availableUntil ?? "2024-05-20";
+
   return (
     <div id="wd-assignments-editor" className="p-3">
       <Form>
         <Form.Group className="mb-3" controlId="wd-name">
-          <Form.Label><strong>Assignment Name</strong></Form.Label>
-          <Form.Control type="text" defaultValue="A1 – ENV + HTML" />
+          <Form.Label>
+            <strong>Assignment Name</strong>
+          </Form.Label>
+          <Form.Control type="text" defaultValue={title} />
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="wd-description">
-          <Form.Control
-            as="textarea"
-            rows={5}
-            defaultValue={`The assignment is available online. Submit a link to the landing page of your Web application running on Netlify.
-
-                            The landing page should include the following:
-                            • Your full name and section
-                            • Links to each of the lab assignments
-                            • Link to the Kanbas application
-                            • Links to all relevant source code repositories
-                            • The Kanbas application should include a link back to the landing page.`}
-          />
+          <Form.Control as="textarea" rows={5} defaultValue={description} />
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="wd-points">
-          <Form.Label><strong>Points</strong></Form.Label>
-          <Form.Control type="number" defaultValue={100} />
+          <Form.Label>
+            <strong>Points</strong>
+          </Form.Label>
+          <Form.Control type="number" defaultValue={points} />
         </Form.Group>
 
         <Row className="mb-3">
           <Col>
             <Form.Group controlId="wd-group">
-              <Form.Label><strong>Assignment Group</strong></Form.Label>
+              <Form.Label>
+                <strong>Assignment Group</strong>
+              </Form.Label>
               <Form.Select defaultValue="ASSIGNMENTS">
                 <option>ASSIGNMENTS</option>
                 <option>QUIZZES</option>
@@ -45,7 +77,9 @@ export default function AssignmentEditor() {
           </Col>
           <Col>
             <Form.Group controlId="wd-display-grade-as">
-              <Form.Label><strong>Display Grade as</strong></Form.Label>
+              <Form.Label>
+                <strong>Display Grade as</strong>
+              </Form.Label>
               <Form.Select defaultValue="Percentage">
                 <option>Percentage</option>
                 <option>Points</option>
@@ -56,7 +90,9 @@ export default function AssignmentEditor() {
         </Row>
 
         <Form.Group className="mb-3" controlId="wd-submission-type">
-          <Form.Label><strong>Submission Type</strong></Form.Label>
+          <Form.Label>
+            <strong>Submission Type</strong>
+          </Form.Label>
           <Form.Select defaultValue="Online" className="mb-2">
             <option>Online</option>
             <option>On Paper</option>
@@ -73,7 +109,9 @@ export default function AssignmentEditor() {
         </Form.Group>
 
         <div className="border rounded p-3 mb-3">
-          <Form.Label><strong>Assign</strong></Form.Label>
+          <Form.Label>
+            <strong>Assign</strong>
+          </Form.Label>
 
           <Form.Group className="mb-3" controlId="wd-assign-to">
             <Form.Label>Assign to</Form.Label>
@@ -84,27 +122,30 @@ export default function AssignmentEditor() {
             <Col>
               <Form.Group controlId="wd-due-date">
                 <Form.Label>Due</Form.Label>
-                <Form.Control type="datetime-local" defaultValue="2024-05-13T23:59" />
+                <Form.Control type="datetime-local" defaultValue={due} />
               </Form.Group>
             </Col>
             <Col>
               <Form.Group controlId="wd-available-from">
                 <Form.Label>Available from</Form.Label>
-                <Form.Control type="date" defaultValue="2024-05-06" />
+                <Form.Control type="date" defaultValue={availFrom} />
               </Form.Group>
             </Col>
             <Col>
               <Form.Group controlId="wd-available-until">
                 <Form.Label>Available until</Form.Label>
-                <Form.Control type="date" defaultValue="2024-05-20" />
+                <Form.Control type="date" defaultValue={availUntil} />
               </Form.Group>
             </Col>
           </Row>
         </div>
-
         <div className="d-flex justify-content-end gap-2">
-          <Button variant="secondary">Cancel</Button>
-          <Button variant="danger">Save</Button>
+          <Link href={`/Courses/${cid}/Assignments`} legacyBehavior passHref>
+            <Button as="a" variant="secondary">Cancel</Button>
+          </Link>
+          <Link href={`/Courses/${cid}/Assignments`} legacyBehavior passHref>
+            <Button as="a" variant="danger">Save</Button>
+          </Link>
         </div>
       </Form>
     </div>

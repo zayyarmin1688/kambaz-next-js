@@ -1,11 +1,21 @@
 "use client";
-
+import { useParams } from "next/navigation";
 import { ListGroup, ListGroupItem, Button, Dropdown } from "react-bootstrap";
 import LessonControlButtons from "./LessonControlButtons";
 import ModuleControlButtons from "./ModuleControlButtons";
 import GreenCheckmark from "./GreenCheckmark";
+import * as db from "../../../Database";
+type Lesson = { _id: string; name: string };
+type Module = { _id: string; course: string; name: string; lessons?: Lesson[] };
+
 
 export default function Modules() {
+  const { cid } = useParams<{ cid: string }>();
+
+  const modules: Module[] = (db.modules as Module[]).filter(
+    (m) => m.course === cid
+  );
+
   return (
     <div>
      <div
@@ -54,125 +64,31 @@ export default function Modules() {
       </div>
 
 
-      <br />
+     <ListGroup id="wd-modules" className="rounded-0">
+        {modules.map((module) => (
+          <ListGroupItem key={module._id} className="p-0 mb-5 border-gray">
+            <div className="d-flex justify-content-between align-items-center bg-secondary text-dark px-3 py-2">
+              <div className="fw-semibold">{module.name}</div>
+              <ModuleControlButtons />
+            </div>
 
-      <ListGroup className="rounded-0 mb-5 border-gray">
-        <ListGroupItem className="d-flex justify-content-between align-items-center bg-secondary text-dark">
-          <div className="fw-semibold">Week 1</div>
-          <ModuleControlButtons />
-        </ListGroupItem>
-
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="fw-semibold d-inline-block me-2">LEARNING OBJECTIVES</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Introduction to the course</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Learn what is Web Development</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-      </ListGroup>
-
-      <ListGroup className="rounded-0 mb-5 border-gray">
-        <ListGroupItem className="d-flex justify-content-between align-items-center bg-secondary text-dark">
-          <div className="fw-semibold">Week 2</div>
-          <ModuleControlButtons />
-        </ListGroupItem>
-
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="fw-semibold">READING</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Full Stack Developer - Chapter 1</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Full Stack Developer - Chapter 2</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="fw-semibold">SLIDES</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Intro to HTML and DOM</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Formatting Web Content</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-      </ListGroup>
-
-      <ListGroup className="rounded-0 mb-5 border-gray">
-        <ListGroupItem className="d-flex justify-content-between align-items-center bg-secondary text-dark">
-          <div className="fw-semibold">Week 3</div>
-          <ModuleControlButtons />
-        </ListGroupItem>
-
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="fw-semibold">LEARNING OBJECTIVES</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Learn CSS for styling</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Box model and positioning</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="fw-semibold">SLIDES</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">CSS Selectors</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Flexbox and Grid Layout</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-      </ListGroup>
-
-      <ListGroup className="rounded-0 mb-5 border-gray">
-        <ListGroupItem className="d-flex justify-content-between align-items-center bg-secondary text-dark">
-          <div className="fw-semibold">Week 4</div>
-          <ModuleControlButtons />
-        </ListGroupItem>
-
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="fw-semibold">LEARNING OBJECTIVES</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Finalizing Github</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">React Native</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="fw-semibold">SLIDES</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">React Tutorial</div>
-          <LessonControlButtons />
-        </ListGroupItem>
-        <ListGroupItem className="wd-lesson d-flex align-items-center">
-          <div className="ms-1">Language Choice</div>
-          <LessonControlButtons />
-        </ListGroupItem>
+            {module.lessons?.length ? (
+              module.lessons.map((lesson) => (
+                <ListGroupItem
+                  key={lesson._id}
+                  className="wd-lesson d-flex align-items-center"
+                >
+                  <div className="ms-1">{lesson.name}</div>
+                  <LessonControlButtons />
+                </ListGroupItem>
+              ))
+            ) : (
+              <ListGroupItem className="text-muted">
+                No lessons yet
+              </ListGroupItem>
+            )}
+          </ListGroupItem>
+        ))}
       </ListGroup>
     </div>
   );

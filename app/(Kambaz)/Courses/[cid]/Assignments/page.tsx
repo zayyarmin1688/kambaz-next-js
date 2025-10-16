@@ -1,30 +1,40 @@
 "use client";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { FormControl, Button, ListGroup, ListGroupItem } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
-import GreenCheckmark from "../Modules/GreenCheckmark";
 import { IoEllipsisVertical } from "react-icons/io5";
+import GreenCheckmark from "../Modules/GreenCheckmark";
+
+import * as db from "../../../Database";
+
+type Assignment = {
+  _id: string;
+  title: string;
+  course: string;
+  points?: number;
+  available?: string; 
+  due?: string;   
+};
 
 export default function Assignments() {
+  const { cid } = useParams<{ cid: string }>();
+
+  const items = (db.assignments as Assignment[]).filter(assign => assign.course === cid);
+
   return (
     <div id="wd-assignments">
       <div className="d-flex mb-3">
         <div className="d-flex align-items-center flex-grow-1">
           <FaSearch className="me-2 text-secondary" />
-          <FormControl
-            placeholder="Search for Assignments"
-            id="wd-search-assignment"
-          />
+          <FormControl placeholder="Search for Assignments" id="wd-search-assignment" />
         </div>
-        <Button variant="secondary" className="ms-2">
-          + Group
-        </Button>
-        <Button variant="danger" className="ms-2">
-          + Assignment
-        </Button>
+        <Button variant="secondary" className="ms-2">+ Group</Button>
+        <Button variant="danger" className="ms-2">+ Assignment</Button>
       </div>
 
+      {/* List */}
       <ListGroup className="rounded-0">
         <ListGroupItem className="d-flex justify-content-between align-items-center bg-secondary fw-bold border-start border-end border-top border-bottom">
           <span>ASSIGNMENTS</span>
@@ -36,53 +46,46 @@ export default function Assignments() {
           </span>
         </ListGroupItem>
 
-        <ListGroupItem className="d-flex justify-content-between align-items-center border-start border-end border-bottom">
-          <div>
-            <Link href="/Courses/1234/Assignments/123" className="fw-bold text-primary">
-              A1 - ENV + HTML
-            </Link>
-            <div>
-              Multiple Modules | <b>Not available until</b> May 6 at 12:00am <br />
-              <b>Due</b> May 13 at 11:59pm | <b>100 pts</b>
-            </div>
-          </div>
-          <div className="d-flex align-items-center ms-3">
-            <GreenCheckmark />
-            <IoEllipsisVertical className="fs-4 ms-2" />
-          </div>
-        </ListGroupItem>
+        {items.length === 0 && (
+          <ListGroupItem className="border-start border-end border-bottom">
+            No assignments for this course yet.
+          </ListGroupItem>
+        )}
 
-        <ListGroupItem className="d-flex justify-content-between align-items-center border-start border-end border-bottom">
-          <div>
-            <Link href="/Courses/1234/Assignments/124" className="fw-bold text-primary">
-              A2 – CSS + BOOTSTRAP
-            </Link>
+        {items.map(a => (
+          <ListGroupItem
+            key={a._id}
+            className="d-flex justify-content-between align-items-center border-start border-end border-bottom"
+          >
             <div>
-              Multiple Modules | <b>Not available until</b> May 13 at 12:00am <br />
-              <b>Due</b> May 20 at 11:59pm | <b>100 pts</b>
+              <Link
+                href={`/Courses/${cid}/Assignments/${a._id}`}
+                className="fw-bold text-primary"
+              >
+                {a.title}
+              </Link>
+              <div>
+                Multiple Modules{" "}
+                {a.available && (
+                  <>
+                    | <b>Not available until</b> {a.available}
+                  </>
+                )}{" "}
+                <br />
+                {a.due && (
+                  <>
+                    <b>Due</b> {a.due} |{" "}
+                  </>
+                )}
+                <b>{(a.points ?? 100)} pts</b>
+              </div>
             </div>
-          </div>
-          <div className="d-flex align-items-center ms-3">
-            <GreenCheckmark />
-            <IoEllipsisVertical className="fs-4 ms-2" />
-          </div>
-        </ListGroupItem>
-
-        <ListGroupItem className="d-flex justify-content-between align-items-center border-start border-end border-bottom">
-          <div>
-            <Link href="/Courses/1234/Assignments/125" className="fw-bold text-primary">
-              A3 – JAVASCRIPT + REACT
-            </Link>
-            <div>
-              Multiple Modules | <b>Not available until</b> May 20 at 12:00am <br />
-              <b>Due</b> May 27 at 11:59pm | <b>100 pts</b>
+            <div className="d-flex align-items-center ms-3">
+              <GreenCheckmark />
+              <IoEllipsisVertical className="fs-4 ms-2" />
             </div>
-          </div>
-          <div className="d-flex align-items-center ms-3">
-            <GreenCheckmark />
-            <IoEllipsisVertical className="fs-4 ms-2" />
-          </div>
-        </ListGroupItem>
+          </ListGroupItem>
+        ))}
       </ListGroup>
     </div>
   );
