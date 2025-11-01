@@ -1,4 +1,6 @@
 'use client';
+
+
 export default function Lab1() {
   return (
     <div id="wd-lab1">
@@ -298,13 +300,13 @@ export default function Lab1() {
         <h4>GitHub</h4>
         This is my 
         <a href="https://github.com/zayyarmin1688" id="wd-github">Github</a>
-
-
-
-
-
-
       </div>
+
+
+
+
+
+
     </div>
   );
 }

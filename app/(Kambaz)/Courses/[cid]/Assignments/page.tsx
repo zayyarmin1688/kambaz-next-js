@@ -1,27 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { FormControl, Button, ListGroup, ListGroupItem } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
 import { IoEllipsisVertical } from "react-icons/io5";
 import GreenCheckmark from "../Modules/GreenCheckmark";
-
-import * as db from "../../../Database";
-
-type Assignment = {
-  _id: string;
-  title: string;
-  course: string;
-  points?: number;
-  available?: string; 
-  due?: string;   
-};
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState } from "../../../store";
+import { deleteAssignment, type Assignment } from "./reducer";
 
 export default function Assignments() {
   const { cid } = useParams<{ cid: string }>();
+  const router = useRouter();
+  const dispatch = useDispatch();
 
-  const items = (db.assignments as Assignment[]).filter(assign => assign.course === cid);
+  const items = useSelector(
+    (s: RootState) =>
+      s.assignmentsReducer.assignments.filter((a) => a.course === cid)
+  );
 
   return (
     <div id="wd-assignments">
@@ -31,10 +28,16 @@ export default function Assignments() {
           <FormControl placeholder="Search for Assignments" id="wd-search-assignment" />
         </div>
         <Button variant="secondary" className="ms-2">+ Group</Button>
-        <Button variant="danger" className="ms-2">+ Assignment</Button>
+        <Button
+          variant="danger"
+          className="ms-2"
+          // go to editor in "create" mode
+          onClick={() => router.push(`/Courses/${cid}/Assignments/new`)}
+        >
+          + Assignment
+        </Button>
       </div>
 
-      {/* List */}
       <ListGroup className="rounded-0">
         <ListGroupItem className="d-flex justify-content-between align-items-center bg-secondary fw-bold border-start border-end border-top border-bottom">
           <span>ASSIGNMENTS</span>
@@ -52,7 +55,7 @@ export default function Assignments() {
           </ListGroupItem>
         )}
 
-        {items.map(a => (
+        {items.map((a: Assignment) => (
           <ListGroupItem
             key={a._id}
             className="d-flex justify-content-between align-items-center border-start border-end border-bottom"
@@ -66,9 +69,9 @@ export default function Assignments() {
               </Link>
               <div>
                 Multiple Modules{" "}
-                {a.available && (
+                {a.availableFrom && (
                   <>
-                    | <b>Not available until</b> {a.available}
+                    | <b>Not available until</b> {a.availableFrom}
                   </>
                 )}{" "}
                 <br />
@@ -77,10 +80,23 @@ export default function Assignments() {
                     <b>Due</b> {a.due} |{" "}
                   </>
                 )}
-                <b>{(a.points ?? 100)} pts</b>
+                <b>{a.points ?? 100} pts</b>
               </div>
             </div>
+
             <div className="d-flex align-items-center ms-3">
+              <Button
+                size="sm"
+                variant="outline-danger"
+                className="me-2"
+                onClick={() => {
+                  if (confirm("Remove this assignment?")) {
+                    dispatch(deleteAssignment(a._id));
+                  }
+                }}
+              >
+                Delete
+              </Button>
               <GreenCheckmark />
               <IoEllipsisVertical className="fs-4 ms-2" />
             </div>
