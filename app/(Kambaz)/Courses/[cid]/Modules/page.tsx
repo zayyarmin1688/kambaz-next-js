@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { ListGroup, ListGroupItem, FormControl } from "react-bootstrap";
+import { ListGroup, ListGroupItem, FormControl, Button } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../store";
 import ModulesControls from "./ModulesControls";
@@ -15,6 +15,7 @@ import {
   Module,
 } from "./reducer";
 import LessonControlButtons from "./LessonControlButtons";
+import "./modules.css"; 
 
 export default function Modules() {
   const { cid } = useParams<{ cid: string }>();
@@ -45,11 +46,16 @@ export default function Modules() {
 
   return (
     <div className="wd-modules">
-      <ModulesControls
-        moduleName={moduleName}
-        setModuleName={setModuleName}
-        addModule={addModule}
-      />
+      <div
+        id="wd-modules-toolbar"
+        className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3"
+      >
+        <ModulesControls
+          moduleName={moduleName}
+          setModuleName={setModuleName}
+          addModule={addModule}
+        />
+      </div>
 
       <ListGroup id="wd-modules" className="rounded-0">
         {courseModules.map((module) => (
@@ -92,7 +98,9 @@ export default function Modules() {
                 </ListGroupItem>
               ))
             ) : (
-              <ListGroupItem className="text-muted">No lessons yet</ListGroupItem>
+              <ListGroupItem className="text-muted">
+                No lessons yet
+              </ListGroupItem>
             )}
           </ListGroupItem>
         ))}
