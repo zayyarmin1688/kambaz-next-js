@@ -21,7 +21,6 @@ export default function Modules() {
   const dispatch = useDispatch();
   const { modules } = useSelector((s: RootState) => s.modulesReducer);
 
-  // local state only for the modal input
   const [moduleName, setModuleName] = useState("");
 
   const addModule = () => {

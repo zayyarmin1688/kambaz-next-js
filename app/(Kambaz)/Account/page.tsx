@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 export default function AccountPage() {
   const { currentUser } = useSelector((state: RootState) => state.accountReducer);
 
-  if (currentUser) {
+  if (!currentUser) {
     redirect("/Account/Profile");
   } else {
     redirect("/Account/Signin");

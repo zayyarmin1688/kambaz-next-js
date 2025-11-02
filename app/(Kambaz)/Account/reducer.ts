@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 const initialState = {
-  currentUser: null,
+  currentUser: null as any,
 };
 
 const accountSlice = createSlice({

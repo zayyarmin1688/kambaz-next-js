@@ -19,7 +19,6 @@ export default function AssignmentEditor() {
 
   const isNew = aid === "new";
 
-  // Defaults (preserve your current appearance/values)
   const [title, setTitle] = useState(existing?.title ?? "Untitled Assignment");
   const [description, setDescription] = useState(
     existing?.description ??
