@@ -1,12 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { addAssignment, updateAssignment, type Assignment } from "../reducer";
+import {
+  addAssignment,
+  updateAssignment,
+  type Assignment,
+} from "../reducer";
 import type { RootState } from "../../../../store";
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
+import * as client from "../client";
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams<{ cid: string; aid: string }>();
@@ -14,15 +18,16 @@ export default function AssignmentEditor() {
   const dispatch = useDispatch();
 
   const existing = useSelector((s: RootState) =>
-    s.assignmentsReducer.assignments.find((a) => a.course === cid && a._id === aid)
+    s.assignmentsReducer.assignments.find(
+      (a) => a.course === cid && a._id === aid
+    )
   );
 
   const isNew = aid === "new";
 
-  const [title, setTitle] = useState(existing?.title ?? "Untitled Assignment");
+  const [title, setTitle] = useState("Untitled Assignment");
   const [description, setDescription] = useState(
-    existing?.description ??
-      `The assignment is available online.
+    `The assignment is available online.
 
 The landing page should include:
 • Your full name and section
@@ -31,31 +36,40 @@ The landing page should include:
 • Links to all relevant source code repositories
 • The Kanbas application should include a link back to the landing page.`
   );
-  const [points, setPoints] = useState<number>(existing?.points ?? 100);
-  const [due, setDue] = useState(existing?.due ?? "2024-05-13T23:59");
-  const [availableFrom, setAvailableFrom] = useState(
-    existing?.availableFrom ?? "2024-05-06"
-  );
-  const [availableUntil, setAvailableUntil] = useState(
-    existing?.availableUntil ?? "2024-05-20"
-  );
+  const [points, setPoints] = useState<number>(100);
+  const [due, setDue] = useState("2024-05-13T23:59");
+  const [availableFrom, setAvailableFrom] = useState("2024-05-06");
+  const [availableUntil, setAvailableUntil] = useState("2024-05-20");
+
+  // Initialize from existing Redux state, if we have it
+  useEffect(() => {
+    if (existing) {
+      setTitle(existing.title);
+      if (existing.description) setDescription(existing.description);
+      if (existing.points !== undefined) setPoints(existing.points);
+      if (existing.due) setDue(existing.due);
+      if (existing.availableFrom) setAvailableFrom(existing.availableFrom);
+      if (existing.availableUntil) setAvailableUntil(existing.availableUntil);
+    }
+  }, [existing]);
 
   const goBack = () => router.push(`/Courses/${cid}/Assignments`);
 
-  const onSave = () => {
+  const onSave = async () => {
+    if (!cid) return;
+
     if (isNew) {
-      dispatch(
-        addAssignment({
-          course: cid,
-          title,
-          description,
-          points,
-          due,
-          availableFrom,
-          availableUntil,
-        })
-      );
-    } else if (existing) {
+      // create on server
+      const created = await client.createAssignmentForCourse(cid, {
+        title,
+        description,
+        points,
+        due,
+        availableFrom,
+        availableUntil,
+      });
+      dispatch(addAssignment(created));
+    } else if (existing && existing._id) {
       const updated: Assignment = {
         ...existing,
         title,
@@ -65,8 +79,10 @@ The landing page should include:
         availableFrom,
         availableUntil,
       };
+      await client.updateAssignmentOnServer(updated);
       dispatch(updateAssignment(updated));
     }
+
     goBack();
   };
 
@@ -141,14 +157,14 @@ The landing page should include:
             <option>On Paper</option>
           </Form.Select>
 
-        <div className="border rounded p-2 bg-light">
-          <strong>Online Entry Options</strong>
-          <Form.Check type="checkbox" label="Text Entry" />
-          <Form.Check type="checkbox" label="Website URL" defaultChecked />
-          <Form.Check type="checkbox" label="Media Recordings" />
-          <Form.Check type="checkbox" label="Student Annotation" />
-          <Form.Check type="checkbox" label="File Uploads" />
-        </div>
+          <div className="border rounded p-2 bg-light">
+            <strong>Online Entry Options</strong>
+            <Form.Check type="checkbox" label="Text Entry" />
+            <Form.Check type="checkbox" label="Website URL" defaultChecked />
+            <Form.Check type="checkbox" label="Media Recordings" />
+            <Form.Check type="checkbox" label="Student Annotation" />
+            <Form.Check type="checkbox" label="File Uploads" />
+          </div>
         </Form.Group>
 
         <div className="border rounded p-3 mb-3">
@@ -196,8 +212,12 @@ The landing page should include:
         </div>
 
         <div className="d-flex justify-content-end gap-2">
-          <Button variant="secondary" onClick={goBack}>Cancel</Button>
-          <Button variant="danger" onClick={onSave}>Save</Button>
+          <Button variant="secondary" onClick={goBack}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={onSave}>
+            Save
+          </Button>
         </div>
       </Form>
     </div>

@@ -1,21 +1,23 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { ListGroup, ListGroupItem, FormControl, Button } from "react-bootstrap";
+import { ListGroup, ListGroupItem, FormControl } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../store";
 import ModulesControls from "./ModulesControls";
 import ModuleControlButtons from "./ModuleControlButtons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   addModule as addModuleAction,
   deleteModule as deleteModuleAction,
   editModule as editModuleAction,
   updateModule as updateModuleAction,
+  setModules,
   Module,
 } from "./reducer";
 import LessonControlButtons from "./LessonControlButtons";
-import "./modules.css"; 
+import "./modules.css";
+import * as client from "../../client";
 
 export default function Modules() {
   const { cid } = useParams<{ cid: string }>();
@@ -24,22 +26,52 @@ export default function Modules() {
 
   const [moduleName, setModuleName] = useState("");
 
-  const addModule = () => {
-    if (!moduleName.trim()) return;
-    dispatch(addModuleAction({ course: cid, name: moduleName.trim() }));
-    setModuleName("");
-  };
+  useEffect(() => {
+    const fetchModules = async () => {
+      if (!cid) return;
+      try {
+        const serverModules = await client.findModulesForCourse(cid);
+        dispatch(setModules(serverModules));
+      } catch (err) {
+        console.error("Error loading modules", err);
+      }
+    };
+    fetchModules();
+  }, [cid, dispatch]);
 
-  const deleteModule = (moduleId: string) => {
-    dispatch(deleteModuleAction(moduleId));
+  const addModule = async () => {
+    if (!moduleName.trim() || !cid) return;
+    try {
+      const newModule = await client.createModuleForCourse(cid, {
+        name: moduleName.trim(),
+      });
+      dispatch(addModuleAction(newModule));
+      setModuleName("");
+    } catch (err) {
+      console.error("Error creating module", err);
+    }
+  };
+  const deleteModule = async (moduleId: string) => {
+    try {
+      await client.deleteModule(moduleId);
+      dispatch(deleteModuleAction(moduleId));
+    } catch (err) {
+      console.error("Error deleting module", err);
+    }
   };
 
   const editModule = (moduleId: string) => {
     dispatch(editModuleAction(moduleId));
   };
 
-  const updateModule = (module: Module) => {
-    dispatch(updateModuleAction(module));
+
+  const updateModule = async (module: Module) => {
+    try {
+      await client.updateModule(module);
+      dispatch(updateModuleAction(module));
+    } catch (err) {
+      console.error("Error updating module", err);
+    }
   };
 
   const courseModules = modules.filter((m) => m.course === cid);

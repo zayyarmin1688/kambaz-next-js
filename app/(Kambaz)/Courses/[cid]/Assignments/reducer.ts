@@ -1,8 +1,6 @@
 "use client";
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import * as db from "../../../Database";
-import { v4 as uuidv4 } from "uuid";
 
 export type Assignment = {
   _id: string;
@@ -11,8 +9,8 @@ export type Assignment = {
   description?: string;
   points?: number;
   availableFrom?: string;
-  availableUntil?: string; 
-  due?: string;  
+  availableUntil?: string;
+  due?: string;
 };
 
 type AssignmentsState = {
@@ -20,33 +18,25 @@ type AssignmentsState = {
 };
 
 const initialState: AssignmentsState = {
-  assignments: (db.assignments as Assignment[]) ?? [],
+  // now populated from the server, not from Database
+  assignments: [],
 };
 
 const assignmentsSlice = createSlice({
   name: "assignments",
   initialState,
   reducers: {
-    addAssignment: (
-      state,
-      action: PayloadAction<
-        Omit<Assignment, "_id"> & { _id?: string }
-      >
-    ) => {
-      const a = action.payload;
-      const newAssignment: Assignment = {
-        _id: a._id ?? uuidv4(),
-        course: a.course,
-        title: a.title,
-        description: a.description,
-        points: a.points,
-        availableFrom: a.availableFrom,
-        availableUntil: a.availableUntil,
-        due: a.due,
-      };
-      state.assignments = [newAssignment, ...state.assignments];
+    // used after calling findAssignmentsForCourse on the server
+    setAssignments: (state, action: PayloadAction<Assignment[]>) => {
+      state.assignments = action.payload;
     },
 
+    // used after createAssignmentForCourse returns the new assignment
+    addAssignment: (state, action: PayloadAction<Assignment>) => {
+      state.assignments = [action.payload, ...state.assignments];
+    },
+
+    // used after updating an assignment on the server
     updateAssignment: (state, action: PayloadAction<Assignment>) => {
       const updated = action.payload;
       state.assignments = state.assignments.map((a) =>
@@ -54,6 +44,7 @@ const assignmentsSlice = createSlice({
       );
     },
 
+    // used after deleteAssignmentOnServer succeeds
     deleteAssignment: (state, action: PayloadAction<string>) => {
       const id = action.payload;
       state.assignments = state.assignments.filter((a) => a._id !== id);
@@ -61,7 +52,11 @@ const assignmentsSlice = createSlice({
   },
 });
 
-export const { addAssignment, updateAssignment, deleteAssignment } =
-  assignmentsSlice.actions;
+export const {
+  setAssignments,
+  addAssignment,
+  updateAssignment,
+  deleteAssignment,
+} = assignmentsSlice.actions;
 
 export default assignmentsSlice.reducer;

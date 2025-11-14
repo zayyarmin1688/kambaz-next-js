@@ -4,14 +4,31 @@ import Link from "next/link";
 import Image from "next/image";
 import { Row, Col, Card, Button, FormControl } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, MouseEvent } from "react";
+import { useEffect, useState, MouseEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { addNewCourse, deleteCourse, updateCourse, Course } from "../Courses/reducer";
+
+import {
+  addNewCourse,
+  deleteCourse as deleteCourseFromStore,
+  updateCourse as updateCourseInStore,
+  setCourses,
+  Course,
+} from "../Courses/reducer";
 import { RootState } from "../store";
-import { enroll, unenroll } from "../Enrollments/reducer";
+
+import {
+  enroll as enrollInStore,
+  unenroll as unenrollInStore,
+  setEnrollments,
+  Enrollment,
+} from "../Enrollments/reducer";
+
+import * as coursesClient from "../Courses/client";
+import * as enrollmentsClient from "../Enrollments/client";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
+
   const { courses } = useSelector((s: RootState) => s.coursesReducer);
   const { currentUser } = useSelector((s: RootState) => s.accountReducer);
   const { enrollments } = useSelector((s: RootState) => s.enrollmentsReducer);
@@ -25,12 +42,50 @@ export default function Dashboard() {
     image: "/images/reactjs.jpg",
   });
 
-  const add = () => {
-    dispatch(addNewCourse({ ...course, _id: uuidv4() }));
+  // ---------- fetch from server ----------
+
+  const fetchCourses = async () => {
+    try {
+      const serverCourses = await coursesClient.fetchAllCourses();
+      dispatch(setCourses(serverCourses));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const update = () => {
-    dispatch(updateCourse(course));
+  const fetchEnrollments = async () => {
+    try {
+      const serverEnrollments: Enrollment[] =
+        await enrollmentsClient.fetchEnrollments();
+      dispatch(setEnrollments(serverEnrollments));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+    fetchEnrollments();
+  }, [currentUser]);
+
+  // ---------- helpers ----------
+
+  const add = async () => {
+    const newCourse = await coursesClient.createCourse({
+      ...course,
+      _id: uuidv4(),
+    });
+    dispatch(addNewCourse(newCourse));
+  };
+
+  const update = async () => {
+    await coursesClient.updateCourse(course);
+    dispatch(updateCourseInStore(course));
+  };
+
+  const onDeleteCourse = async (courseId: string) => {
+    await coursesClient.deleteCourse(courseId);
+    dispatch(deleteCourseFromStore(courseId));
   };
 
   const isEnrolled = (courseId: string): boolean => {
@@ -40,11 +95,28 @@ export default function Dashboard() {
         enrollment.user === currentUser._id &&
         enrollment.course === courseId
     );
-  }
+  };
 
-  const list = showAll
-    ? courses
-    : courses.filter((c) => isEnrolled(c._id));
+  const onEnroll = async (courseId: string) => {
+    if (!currentUser) return;
+    const newEnrollment = await enrollmentsClient.enrollInCourse({
+      user: currentUser._id,
+      course: courseId,
+    });
+    dispatch(enrollInStore(newEnrollment));
+  };
+
+  const onUnenroll = async (courseId: string) => {
+    if (!currentUser) return;
+    const existing = enrollments.find(
+      (e) => e.user === currentUser._id && e.course === courseId
+    );
+    if (!existing) return;
+    await enrollmentsClient.unenrollFromCourse(existing._id);
+    dispatch(unenrollInStore(existing._id));
+  };
+
+  const list = showAll ? courses : courses.filter((c) => isEnrolled(c._id));
 
   const cards = list.map((c) => ({
     cid: c._id,
@@ -65,7 +137,9 @@ export default function Dashboard() {
   return (
     <div id="wd-dashboard">
       <div className="d-flex align-items-center justify-content-between">
-        <h1 id="wd-dashboard-title" className="mb-0">Dashboard</h1>
+        <h1 id="wd-dashboard-title" className="mb-0">
+          Dashboard
+        </h1>
         <Button
           variant="primary"
           onClick={() => setShowAll((v) => !v)}
@@ -87,7 +161,9 @@ export default function Dashboard() {
         value={course.description}
         as="textarea"
         rows={3}
-        onChange={(e) => setCourse({ ...course, description: e.target.value })}
+        onChange={(e) =>
+          setCourse({ ...course, description: e.target.value })
+        }
       />
       <div className="mt-2">
         <Button className="me-2" onClick={update} id="wd-update-course-click">
@@ -135,7 +211,10 @@ export default function Dashboard() {
               </Link>
 
               <Card.Footer className="d-flex gap-2">
-                <Link href={enrolled ? href : "#"} onClick={(e) => handleCardLink(e, enrolled)}>
+                <Link
+                  href={enrolled ? href : "#"}
+                  onClick={(e) => handleCardLink(e, enrolled)}
+                >
                   <Button variant="primary" disabled={!enrolled}>
                     Go
                   </Button>
@@ -158,19 +237,19 @@ export default function Dashboard() {
                   id="wd-delete-course-click"
                   onClick={(e) => {
                     e.preventDefault();
-                    dispatch(deleteCourse(cid));
+                    onDeleteCourse(cid);
                   }}
                 >
                   Delete
                 </Button>
 
-                {currentUser && (
-                  enrolled ? (
+                {currentUser &&
+                  (enrolled ? (
                     <Button
                       variant="danger"
                       onClick={(e) => {
                         e.preventDefault();
-                        dispatch(unenroll({ user: currentUser._id, course: cid }));
+                        onUnenroll(cid);
                       }}
                     >
                       Unenroll
@@ -180,13 +259,12 @@ export default function Dashboard() {
                       variant="success"
                       onClick={(e) => {
                         e.preventDefault();
-                        dispatch(enroll({ user: currentUser._id, course: cid }));
+                        onEnroll(cid);
                       }}
                     >
                       Enroll
                     </Button>
-                  )
-                )}
+                  ))}
               </Card.Footer>
             </Card>
           </Col>
@@ -195,3 +273,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

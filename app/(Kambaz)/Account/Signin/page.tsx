@@ -1,43 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { Form, FormControl, Button } from "react-bootstrap";
 
-import * as db from "../../Database";
+import * as client from "../client";
 import { setCurrentUser } from "../reducer";
 
-interface User {
-  _id: string;
+interface Credentials {
   username: string;
   password: string;
-  [key: string]: unknown;
 }
 
 export default function Signin() {
-  const router = useRouter();
   const dispatch = useDispatch();
 
-  const [credentials, setCredentials] = useState<{ username: string; password: string }>({
+  const [credentials, setCredentials] = useState<Credentials>({
     username: "",
     password: "",
   });
 
-  const signIn = () => {
-    const users = (db as { users: User[] }).users;
-
-    const user = users.find(
-      (u) =>
-        u.username === credentials.username &&
-        u.password === credentials.password
-    );
-
-    if (!user) return; 
-
-    dispatch(setCurrentUser(user)); 
-    router.push("/Dashboard"); 
+  const signin = async () => {
+    const user = await client.signin(credentials);
+    if (!user) return;                 // no match, stay on page
+    dispatch(setCurrentUser(user));    // save logged-in user in Redux
+    redirect("/Dashboard");            // go to dashboard (same as before)
   };
 
   return (
@@ -64,7 +53,12 @@ export default function Signin() {
             setCredentials((c) => ({ ...c, password: e.target.value }))
           }
         />
-        <Button id="wd-signin-btn" className="w-100 mb-2" onClick={signIn}>
+        <Button
+          id="wd-signin-btn"
+          className="w-100 mb-2"
+          type="button"
+          onClick={signin}
+        >
           Sign in
         </Button>
         <Link id="wd-signup-link" href="/Account/Signup" className="small">
@@ -74,4 +68,3 @@ export default function Signin() {
     </div>
   );
 }
-
