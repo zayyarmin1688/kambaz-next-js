@@ -18,6 +18,7 @@ export default function WorkingWithArrays() {
     <div id="wd-working-with-arrays">
       <h2>Working with Arrays</h2>
 
+
       <h3>Retrieving Arrays</h3>
       <a
         id="wd-retrieve-todos"

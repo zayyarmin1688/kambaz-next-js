@@ -24,9 +24,9 @@ export default function Signin() {
 
   const signin = async () => {
     const user = await client.signin(credentials);
-    if (!user) return;                 // no match, stay on page
-    dispatch(setCurrentUser(user));    // save logged-in user in Redux
-    redirect("/Dashboard");            // go to dashboard (same as before)
+    if (!user) return;  
+    dispatch(setCurrentUser(user));  
+    redirect("/Dashboard");   
   };
 
   return (

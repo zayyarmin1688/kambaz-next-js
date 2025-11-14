@@ -25,7 +25,6 @@ export default function Assignments() {
     s.assignmentsReducer.assignments.filter((a) => a.course === cid)
   );
 
-  // Load assignments for this course from the server
   useEffect(() => {
     const load = async () => {
       if (!cid) return;

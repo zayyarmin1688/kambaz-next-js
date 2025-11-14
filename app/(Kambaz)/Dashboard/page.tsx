@@ -68,8 +68,6 @@ export default function Dashboard() {
     fetchEnrollments();
   }, [currentUser]);
 
-  // ---------- helpers ----------
-
   const add = async () => {
     const newCourse = await coursesClient.createCourse({
       ...course,

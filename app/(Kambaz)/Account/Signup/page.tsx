@@ -21,7 +21,7 @@ export default function Signup() {
   const signup = async () => {
     const currentUser = await client.signup(user);
     dispatch(setCurrentUser(currentUser));
-    redirect("/Profile"); // matches the book's instructions
+    redirect("/Profile");
   };
 
   return (
