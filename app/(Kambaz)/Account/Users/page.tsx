@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/(Kambaz)/Account/Users/page.tsx
 "use client";
 
