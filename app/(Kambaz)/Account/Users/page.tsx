@@ -4,7 +4,8 @@
 
 import { useEffect, useState } from "react";
 import { FormControl } from "react-bootstrap";
-import PeopleTable from "../../Courses/[cid]/People/Table/page";
+// import PeopleTable from "../../Courses/[cid]/People/Table/page";
+import PeopleTable from "./PeopleTable";
 import * as client from "../client";
 
 export default function Users() {
