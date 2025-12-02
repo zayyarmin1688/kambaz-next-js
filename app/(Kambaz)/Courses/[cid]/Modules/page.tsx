@@ -31,6 +31,7 @@ export default function Modules() {
       if (!cid) return;
       try {
         const serverModules = await client.findModulesForCourse(cid);
+        // we’re already on a per-course page, so the whole list is for this course
         dispatch(setModules(serverModules));
       } catch (err) {
         console.error("Error loading modules", err);
@@ -42,18 +43,27 @@ export default function Modules() {
   const addModule = async () => {
     if (!moduleName.trim() || !cid) return;
     try {
-      const newModule = await client.createModuleForCourse(cid, {
+      const created = await client.createModuleForCourse(cid, {
         name: moduleName.trim(),
       });
+
+      // Make absolutely sure the module has the course ID attached
+      const newModule: Module = {
+        ...created,
+        course: cid,
+      };
+
       dispatch(addModuleAction(newModule));
       setModuleName("");
     } catch (err) {
       console.error("Error creating module", err);
     }
   };
+
   const deleteModule = async (moduleId: string) => {
+    if (!cid) return;
     try {
-      await client.deleteModule(moduleId);
+      await client.deleteModule(cid, moduleId);
       dispatch(deleteModuleAction(moduleId));
     } catch (err) {
       console.error("Error deleting module", err);
@@ -64,17 +74,17 @@ export default function Modules() {
     dispatch(editModuleAction(moduleId));
   };
 
-
   const updateModule = async (module: Module) => {
+    if (!cid) return;
     try {
-      await client.updateModule(module);
+      await client.updateModule(cid, module);
       dispatch(updateModuleAction(module));
     } catch (err) {
       console.error("Error updating module", err);
     }
   };
 
-  const courseModules = modules.filter((m) => m.course === cid);
+  const courseModules = modules;
 
   return (
     <div className="wd-modules">
@@ -140,3 +150,4 @@ export default function Modules() {
     </div>
   );
 }
+

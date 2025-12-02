@@ -1,12 +1,11 @@
-// app/(Kambaz)/Courses/[cid]/People/Table/page.tsx
 "use client";
 
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Table } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
-
-// NOTE: from this file, Database is 4 levels up
-import * as db from "../../../../Database";
+import PeopleDetails from "../Details";
+import { findUsersForCourse } from "../../../client";
 
 type User = {
   _id: string;
@@ -19,20 +18,45 @@ type User = {
   totalActivity: string;
 };
 
-type Enrollment = { _id: string; user: string; course: string };
+export default function PeopleTablePage() {
+  const params = useParams<{ cid: string }>();
+  const courseId = params.cid;
 
-export default function PeopleTable() {
-  const { cid } = useParams<{ cid: string }>();
+  const [users, setUsers] = useState<User[]>([]);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showUserId, setShowUserId] = useState<string | null>(null);
 
-  const users = (db.users as User[]) ?? [];
-  const enrollments = (db.enrollments as Enrollment[]) ?? [];
+  const fetchUsers = async () => {
+    if (!courseId) return;
+    const data = await findUsersForCourse(courseId);
+    setUsers(data);
+  };
 
-  const courseUsers = users.filter((user) =>
-    enrollments.some((enroll) => enroll.user === user._id && enroll.course === cid)
-  );
+  useEffect(() => {
+    void fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId]);
+
+  const handleOpenDetails = (userId: string) => {
+    setShowUserId(userId);
+    setShowDetails(true);
+  };
+
+  const handleCloseDetails = () => {
+    setShowDetails(false);
+    setShowUserId(null);
+  };
 
   return (
     <div id="wd-people-table" className="mt-2">
+      {showDetails && showUserId && (
+        <PeopleDetails
+          uid={showUserId}
+          onClose={handleCloseDetails}
+          fetchUsers={fetchUsers}
+        />
+      )}
+
       <Table striped hover responsive className="align-middle">
         <thead className="bg-light">
           <tr>
@@ -45,11 +69,17 @@ export default function PeopleTable() {
           </tr>
         </thead>
         <tbody>
-          {courseUsers.map((user) => (
+          {users.map((user) => (
             <tr key={user._id}>
               <td className="wd-full-name text-nowrap">
                 <FaUserCircle className="me-2 fs-4 text-secondary" />
-                <span className="wd-first-name">{user.firstName}</span>{" "}
+                <span
+                  className="wd-first-name text-decoration-none"
+                  onClick={() => handleOpenDetails(user._id)}
+                  style={{ cursor: "pointer" }}
+                >
+                  {user.firstName}
+                </span>{" "}
                 <span className="wd-last-name">{user.lastName}</span>
               </td>
               <td className="wd-login-id">{user.loginId}</td>
@@ -59,7 +89,7 @@ export default function PeopleTable() {
               <td className="wd-total-activity">{user.totalActivity}</td>
             </tr>
           ))}
-          {courseUsers.length === 0 && (
+          {users.length === 0 && (
             <tr>
               <td colSpan={6} className="text-center text-muted py-4">
                 No people enrolled for this course.
@@ -71,4 +101,3 @@ export default function PeopleTable() {
     </div>
   );
 }
-

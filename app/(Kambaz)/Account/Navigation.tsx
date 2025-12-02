@@ -7,9 +7,15 @@ import { RootState } from "../store";
 
 export default function AccountNavigation() {
   const pathname = usePathname();
-  const { currentUser } = useSelector((state: RootState) => state.accountReducer);
+  const { currentUser } = useSelector(
+    (state: RootState) => state.accountReducer
+  );
 
   const links = currentUser ? ["Profile"] : ["Signin", "Signup"];
+
+  if (currentUser && currentUser.role === "ADMIN") {
+    links.push("Users");
+  }
 
   return (
     <div id="wd-account-navigation" className="list-group fs-5 rounded-0">

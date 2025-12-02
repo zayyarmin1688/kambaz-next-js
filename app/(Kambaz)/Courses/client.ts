@@ -11,9 +11,13 @@ export const COURSES_API = `${HTTP_SERVER}/api/courses`;
 export const USERS_API = `${HTTP_SERVER}/api/users`;
 export const MODULES_API = `${HTTP_SERVER}/api/modules`;
 
-
 export const fetchAllCourses = async () => {
   const { data } = await axios.get(COURSES_API);
+  return data;
+};
+
+export const findUsersForCourse = async (courseId: string) => {
+  const { data } = await axios.get(`${COURSES_API}/${courseId}/users`);
   return data;
 };
 
@@ -42,6 +46,7 @@ export const updateCourse = async (course: any) => {
   return data;
 };
 
+// ---------- MODULES ----------
 
 export const findModulesForCourse = async (courseId: string) => {
   const { data } = await axios.get(`${COURSES_API}/${courseId}/modules`);
@@ -59,13 +64,18 @@ export const createModuleForCourse = async (
   return data;
 };
 
-export const deleteModule = async (moduleId: string) => {
-  const { data } = await axios.delete(`${MODULES_API}/${moduleId}`);
+// now include courseId in the URL for delete/update
+export const deleteModule = async (courseId: string, moduleId: string) => {
+  const { data } = await axios.delete(
+    `${COURSES_API}/${courseId}/modules/${moduleId}`
+  );
   return data;
 };
 
-export const updateModule = async (module: any) => {
-  const { data } = await axios.put(`${MODULES_API}/${module._id}`, module);
+export const updateModule = async (courseId: string, module: any) => {
+  const { data } = await axios.put(
+    `${COURSES_API}/${courseId}/modules/${module._id}`,
+    module
+  );
   return data;
 };
-
