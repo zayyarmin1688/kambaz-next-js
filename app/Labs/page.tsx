@@ -18,6 +18,16 @@ export default function Labs() {
            Lab 3: JavaScript Fundamentals </Link>
        </li>
        <li>
+        <Link href="/Labs/Lab4" id="wd-lab4-link">
+          Lab 4: React Events, State & Redux
+        </Link>
+      </li>
+      <li>
+        <Link href="/Labs/Lab5" id="wd-lab5-link">
+          Lab 5: Node HTTP Server & Environment Variables
+        </Link>
+      </li>
+       <li>
         <Link href="/" id="wd-kambaz-link">
         Kambaz</Link>
         </li>

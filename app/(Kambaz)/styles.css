@@ -1,0 +1,56 @@
+body   {
+  margin: 0;
+  padding: 0;
+}
+
+body * {
+  font-family: Arial,
+  Helvetica, sans-serif;
+}
+
+@media (min-width: 768px) {
+  #wd-kambaz .wd-main-content-offset {
+    padding-left: 140px !important;
+  }
+}
+
+#wd-dashboard-courses {
+  padding-left: 10px;
+}
+
+.wd-dashboard-course {
+  width: 300px;
+}
+
+.list-group .list-group-item.active {
+  color: red;
+  background-color: white;
+  border-left: 3px solid black !important;
+}
+
+.bg-secondary {
+  background-color: rgb(199, 205, 209) !important;
+}
+
+
+.list-group-item { --bs-list-group-border-color: gray; }
+.wd-lesson { border-left: 3px solid green !important; }
+
+.btn-secondary {
+  --bs-btn-bg: #d0d6da !important;
+  --bs-btn-border-color: #c4cbd0 !important;
+  --bs-btn-hover-bg: #cbd2d6 !important;
+  --bs-btn-hover-border-color: #bfc7cc !important;
+}
+
+.wd-lesson {
+  border-left: 3px solid green !important;
+}
+
+.bg-secondary {
+  --bs-secondary-rgb: 199, 205, 209; 
+}
+
+.list-group-item {
+  --bs-list-group-border-color: gray;
+}

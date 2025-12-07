@@ -1,4 +1,6 @@
 'use client';
+
+
 export default function Lab1() {
   return (
     <div id="wd-lab1">
@@ -108,6 +110,48 @@ export default function Lab1() {
               <td>JavaScript</td>
               <td>2/17/21</td>
               <td>95</td>
+            </tr>
+            <tr>
+              <td>Q4</td>
+              <td>Python</td>
+              <td>2/25/21</td>
+              <td>100</td>
+            </tr>
+            <tr>
+              <td>Q5</td>
+              <td>Coq</td>
+              <td>3/7/21</td>
+              <td>95</td>
+            </tr>
+            <tr>
+              <td>Q6</td>
+              <td>C++</td>
+              <td>4/17/21</td>
+              <td>100</td>
+            </tr>
+            <tr>
+              <td>Q7</td>
+              <td>TypeScript</td>
+              <td>5/17/21</td>
+              <td>88</td>
+            </tr>
+            <tr>
+              <td>Q8</td>
+              <td>Assembly</td>
+              <td>2/17/21</td>
+              <td>94</td>
+            </tr>
+            <tr>
+              <td>Q9</td>
+              <td>React</td>
+              <td>2/17/21</td>
+              <td>90</td>
+            </tr>
+            <tr>
+              <td>Q10</td>
+              <td>Java</td>
+              <td>2/17/21</td>
+              <td>92</td>
             </tr>
           </tbody>
           <tfoot>
@@ -256,13 +300,13 @@ export default function Lab1() {
         <h4>GitHub</h4>
         This is my 
         <a href="https://github.com/zayyarmin1688" id="wd-github">Github</a>
-
-
-
-
-
-
       </div>
+
+
+
+
+
+
     </div>
   );
 }

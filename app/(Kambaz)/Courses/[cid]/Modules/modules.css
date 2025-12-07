@@ -1,0 +1,17 @@
+
+#wd-modules-toolbar {
+  position: sticky;   
+  top: 0;        
+  z-index: 10;
+  background: #fff;
+  padding: 8px 0;
+}
+
+#wd-modules-toolbar .btn {
+  position: static !important;
+  float: none !important;
+}
+
+#wd-modules .list-group-item {
+  position: relative;
+}

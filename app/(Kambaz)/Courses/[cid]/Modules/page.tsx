@@ -1,97 +1,153 @@
+"use client";
+
+import { useParams } from "next/navigation";
+import { ListGroup, ListGroupItem, FormControl } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../../store";
+import ModulesControls from "./ModulesControls";
+import ModuleControlButtons from "./ModuleControlButtons";
+import { useState, useEffect } from "react";
+import {
+  addModule as addModuleAction,
+  deleteModule as deleteModuleAction,
+  editModule as editModuleAction,
+  updateModule as updateModuleAction,
+  setModules,
+  Module,
+} from "./reducer";
+import LessonControlButtons from "./LessonControlButtons";
+import "./modules.css";
+import * as client from "../../client";
+
 export default function Modules() {
+  const { cid } = useParams<{ cid: string }>();
+  const dispatch = useDispatch();
+  const { modules } = useSelector((s: RootState) => s.modulesReducer);
+
+  const [moduleName, setModuleName] = useState("");
+
+  useEffect(() => {
+    const fetchModules = async () => {
+      if (!cid) return;
+      try {
+        const serverModules = await client.findModulesForCourse(cid);
+        // we’re already on a per-course page, so the whole list is for this course
+        dispatch(setModules(serverModules));
+      } catch (err) {
+        console.error("Error loading modules", err);
+      }
+    };
+    fetchModules();
+  }, [cid, dispatch]);
+
+  const addModule = async () => {
+    if (!moduleName.trim() || !cid) return;
+    try {
+      const created = await client.createModuleForCourse(cid, {
+        name: moduleName.trim(),
+      });
+
+      // Make absolutely sure the module has the course ID attached
+      const newModule: Module = {
+        ...created,
+        course: cid,
+      };
+
+      dispatch(addModuleAction(newModule));
+      setModuleName("");
+    } catch (err) {
+      console.error("Error creating module", err);
+    }
+  };
+
+  const deleteModule = async (moduleId: string) => {
+    if (!cid) return;
+    try {
+      await client.deleteModule(cid, moduleId);
+      dispatch(deleteModuleAction(moduleId));
+    } catch (err) {
+      console.error("Error deleting module", err);
+    }
+  };
+
+  const editModule = (moduleId: string) => {
+    dispatch(editModuleAction(moduleId));
+  };
+
+  const updateModule = async (module: Module) => {
+    if (!cid) return;
+    try {
+      await client.updateModule(cid, module);
+      dispatch(updateModuleAction(module));
+    } catch (err) {
+      console.error("Error updating module", err);
+    }
+  };
+
+  const courseModules = modules;
+
   return (
-    <div>
-      
-      <div id="wd-modules-controls">
-        <button id="wd-modules-collapse-all">Collapse All</button>
-        <button id="wd-modules-view-progress">View Progress</button>
-        <select id="wd-modules-publish-all" defaultValue="Publish All">
-          <option value="Publish All">Publish All</option>
-        </select>
-        <button id="wd-modules-add">+ Module</button>
+    <div className="wd-modules">
+      <div
+        id="wd-modules-toolbar"
+        className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3"
+      >
+        <ModulesControls
+          moduleName={moduleName}
+          setModuleName={setModuleName}
+          addModule={addModule}
+        />
       </div>
-      <br />
 
-      <ul id="wd-modules">
-        <li className="wd-module">
-          <div className="wd-title">Week 1</div>
-          <ul className="wd-lessons">
-            <li className="wd-lesson">
-              <span className="wd-title">LEARNING OBJECTIVES</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">Introduction to the course</li>
-                <li className="wd-content-item">Learn what is Web Development</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
+      <ListGroup id="wd-modules" className="rounded-0">
+        {courseModules.map((module) => (
+          <ListGroupItem key={module._id} className="p-0 mb-5 border-gray">
+            <div className="d-flex justify-content-between align-items-center bg-secondary text-dark px-3 py-2">
+              <div className="fw-semibold">
+                {module.editing ? (
+                  <FormControl
+                    className="w-50 d-inline-block"
+                    defaultValue={module.name}
+                    onChange={(e) =>
+                      updateModule({ ...module, name: e.target.value })
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        updateModule({ ...module, editing: false });
+                      }
+                    }}
+                  />
+                ) : (
+                  module.name
+                )}
+              </div>
 
-        <li className="wd-module">
-          <div className="wd-title">Week 2</div>
-          <ul className="wd-lessons">
-            <li className="wd-lesson">
-              <span className="wd-title">READING</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">Full Stack Developer - Chapter 1</li>
-                <li className="wd-content-item">Full Stack Developer - Chapter 2</li>
-              </ul>
-            </li>
-            <li className="wd-lesson">
-              <span className="wd-title">SLIDES</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">Intro to HTML and DOM</li>
-                <li className="wd-content-item">Formatting Web Content</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
+              <ModuleControlButtons
+                moduleId={module._id}
+                deleteModule={deleteModule}
+                editModule={editModule}
+              />
+            </div>
 
-        <li className="wd-module">
-          <div className="wd-title">Week 3</div>
-          <ul className="wd-lessons">
-            <li className="wd-lesson">
-              <span className="wd-title">LEARNING OBJECTIVES</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">Learn CSS for styling</li>
-                <li className="wd-content-item">Box model and positioning</li>
-              </ul>
-            </li>
-            <li className="wd-lesson">
-              <span className="wd-title">SLIDES</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">CSS Selectors</li>
-                <li className="wd-content-item">Flexbox and Grid Layout</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-
-        <li className="wd-module">
-          <div className="wd-title">Week 4</div>
-          <ul className="wd-lessons">
-            <li className="wd-lesson">
-              <span className="wd-title">LEARNING OBJECTIVES</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">Finalizing Github</li>
-                <li className="wd-content-item">React Native</li>
-              </ul>
-            </li>
-            <li className="wd-lesson">
-              <span className="wd-title">SLIDES</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">React Tutorial</li>
-                <li className="wd-content-item">Language Choice</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-
-
-
-
-
-
-      </ul>
+            {module.lessons?.length ? (
+              module.lessons.map((lesson) => (
+                <ListGroupItem
+                  key={lesson._id}
+                  className="wd-lesson d-flex align-items-center"
+                >
+                  <div className="ms-1">{lesson.name}</div>
+                  <LessonControlButtons />
+                </ListGroupItem>
+              ))
+            ) : (
+              <ListGroupItem className="text-muted">
+                No lessons yet
+              </ListGroupItem>
+            )}
+          </ListGroupItem>
+        ))}
+      </ListGroup>
     </div>
   );
 }
+

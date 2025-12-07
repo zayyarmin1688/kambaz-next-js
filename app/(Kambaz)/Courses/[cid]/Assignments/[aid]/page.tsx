@@ -1,98 +1,225 @@
+"use client";
+
+import { useParams, useRouter } from "next/navigation";
+import { Form, Button, Row, Col } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addAssignment,
+  updateAssignment,
+  type Assignment,
+} from "../reducer";
+import type { RootState } from "../../../../store";
+import { useState, useEffect } from "react";
+import * as client from "../client";
+
 export default function AssignmentEditor() {
+  const { cid, aid } = useParams<{ cid: string; aid: string }>();
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const existing = useSelector((s: RootState) =>
+    s.assignmentsReducer.assignments.find(
+      (a) => a.course === cid && a._id === aid
+    )
+  );
+
+  const isNew = aid === "new";
+
+  const [title, setTitle] = useState("Untitled Assignment");
+  const [description, setDescription] = useState(
+    `The assignment is available online.
+
+The landing page should include:
+• Your full name and section
+• Links to each of the lab assignments
+• Link to the Kanbas application
+• Links to all relevant source code repositories
+• The Kanbas application should include a link back to the landing page.`
+  );
+  const [points, setPoints] = useState<number>(100);
+  const [due, setDue] = useState("2024-05-13T23:59");
+  const [availableFrom, setAvailableFrom] = useState("2024-05-06");
+  const [availableUntil, setAvailableUntil] = useState("2024-05-20");
+
+  // Initialize from existing Redux state, if we have it
+  useEffect(() => {
+    if (existing) {
+      setTitle(existing.title);
+      if (existing.description) setDescription(existing.description);
+      if (existing.points !== undefined) setPoints(existing.points);
+      if (existing.due) setDue(existing.due);
+      if (existing.availableFrom) setAvailableFrom(existing.availableFrom);
+      if (existing.availableUntil) setAvailableUntil(existing.availableUntil);
+    }
+  }, [existing]);
+
+  const goBack = () => router.push(`/Courses/${cid}/Assignments`);
+
+  const onSave = async () => {
+    if (!cid) return;
+
+    if (isNew) {
+      // create on server
+      const created = await client.createAssignmentForCourse(cid, {
+        title,
+        description,
+        points,
+        due,
+        availableFrom,
+        availableUntil,
+      });
+      dispatch(addAssignment(created));
+    } else if (existing && existing._id) {
+      const updated: Assignment = {
+        ...existing,
+        title,
+        description,
+        points,
+        due,
+        availableFrom,
+        availableUntil,
+      };
+      await client.updateAssignmentOnServer(updated);
+      dispatch(updateAssignment(updated));
+    }
+
+    goBack();
+  };
+
   return (
-    <div id="wd-assignments-editor">
-      <label htmlFor="wd-name">Assignment Name</label>
-      <input id="wd-name" defaultValue="A1 – ENV + HTML" /><br/><br/>
+    <div id="wd-assignments-editor" className="p-3">
+      <Form>
+        <Form.Group className="mb-3" controlId="wd-name">
+          <Form.Label>
+            <strong>Assignment Name</strong>
+          </Form.Label>
+          <Form.Control
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </Form.Group>
 
-      <textarea id="wd-description">
-        The assignment is available online. Submit a link to the landing page of your app.
-      </textarea><br/><br/>
+        <Form.Group className="mb-3" controlId="wd-description">
+          <Form.Control
+            as="textarea"
+            rows={5}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </Form.Group>
 
-      <table>
-        <tbody>
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-points">Points</label>
-            </td>
-            <td><input id="wd-points" defaultValue={100} /></td>
-          </tr>
+        <Form.Group className="mb-3" controlId="wd-points">
+          <Form.Label>
+            <strong>Points</strong>
+          </Form.Label>
+          <Form.Control
+            type="number"
+            value={points}
+            onChange={(e) => setPoints(Number(e.target.value))}
+          />
+        </Form.Group>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-group">Assignment Group</label>
-            </td>
-            <td>
-              <select id="wd-group">
+        <Row className="mb-3">
+          <Col>
+            <Form.Group controlId="wd-group">
+              <Form.Label>
+                <strong>Assignment Group</strong>
+              </Form.Label>
+              <Form.Select defaultValue="ASSIGNMENTS">
                 <option>ASSIGNMENTS</option>
                 <option>QUIZZES</option>
                 <option>EXAMS</option>
                 <option>PROJECT</option>
-              </select>
-            </td>
-          </tr>
-
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-display-grade-as">Display Grade as</label>
-            </td>
-            <td>
-              <select id="wd-display-grade-as">
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group controlId="wd-display-grade-as">
+              <Form.Label>
+                <strong>Display Grade as</strong>
+              </Form.Label>
+              <Form.Select defaultValue="Percentage">
                 <option>Percentage</option>
                 <option>Points</option>
                 <option>Complete/Incomplete</option>
-              </select>
-            </td>
-          </tr>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+        </Row>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-submission-type">Submission Type</label>
-            </td>
-            <td>
-              <select id="wd-submission-type">
-                <option>Online</option>
-                <option>On Paper</option>
-              </select>
-              <div>
-                <input type="checkbox" id="wd-text-entry" /> <label htmlFor="wd-text-entry">Text Entry</label><br/>
-                <input type="checkbox" id="wd-website-url" /> <label htmlFor="wd-website-url">Website URL</label><br/>
-                <input type="checkbox" id="wd-media-recordings" /> <label htmlFor="wd-media-recordings">Media Recordings</label><br/>
-                <input type="checkbox" id="wd-student-annotation" /> <label htmlFor="wd-student-annotation">Student Annotation</label><br/>
-                <input type="checkbox" id="wd-file-upload" /> <label htmlFor="wd-file-upload">File Upload</label>
-              </div>
-            </td>
-          </tr>
+        <Form.Group className="mb-3" controlId="wd-submission-type">
+          <Form.Label>
+            <strong>Submission Type</strong>
+          </Form.Label>
+          <Form.Select defaultValue="Online" className="mb-2">
+            <option>Online</option>
+            <option>On Paper</option>
+          </Form.Select>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-assign-to">Assign to</label>
-            </td>
-            <td><input id="wd-assign-to" defaultValue="Everyone" /></td>
-          </tr>
+          <div className="border rounded p-2 bg-light">
+            <strong>Online Entry Options</strong>
+            <Form.Check type="checkbox" label="Text Entry" />
+            <Form.Check type="checkbox" label="Website URL" defaultChecked />
+            <Form.Check type="checkbox" label="Media Recordings" />
+            <Form.Check type="checkbox" label="Student Annotation" />
+            <Form.Check type="checkbox" label="File Uploads" />
+          </div>
+        </Form.Group>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-due-date">Due</label>
-            </td>
-            <td><input id="wd-due-date" type="date" defaultValue="2024-05-13" /></td>
-          </tr>
+        <div className="border rounded p-3 mb-3">
+          <Form.Label>
+            <strong>Assign</strong>
+          </Form.Label>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-available-from">Available from</label>
-            </td>
-            <td><input id="wd-available-from" type="date" defaultValue="2024-05-06" /></td>
-          </tr>
+          <Form.Group className="mb-3" controlId="wd-assign-to">
+            <Form.Label>Assign to</Form.Label>
+            <Form.Control type="text" defaultValue="Everyone" readOnly />
+          </Form.Group>
 
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-available-until">Available until</label>
-            </td>
-            <td><input id="wd-available-until" type="date" defaultValue="2024-05-20" /></td>
-          </tr>
-        </tbody>
-      </table>
+          <Row>
+            <Col>
+              <Form.Group controlId="wd-due-date">
+                <Form.Label>Due</Form.Label>
+                <Form.Control
+                  type="datetime-local"
+                  value={due}
+                  onChange={(e) => setDue(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group controlId="wd-available-from">
+                <Form.Label>Available from</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={availableFrom}
+                  onChange={(e) => setAvailableFrom(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group controlId="wd-available-until">
+                <Form.Label>Available until</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={availableUntil}
+                  onChange={(e) => setAvailableUntil(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+        </div>
+
+        <div className="d-flex justify-content-end gap-2">
+          <Button variant="secondary" onClick={goBack}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={onSave}>
+            Save
+          </Button>
+        </div>
+      </Form>
     </div>
   );
 }
-
