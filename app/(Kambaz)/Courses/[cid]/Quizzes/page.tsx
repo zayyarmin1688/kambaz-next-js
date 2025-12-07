@@ -22,13 +22,13 @@ import {
   type Quiz,
 } from "./reducer";
 import * as client from "./client";
+import UnpublishedIcon from "./UnpublishedIcon";
 
 export default function Quizzes() {
   const { cid } = useParams<{ cid: string }>();
   const router = useRouter();
   const dispatch = useDispatch();
 
-  // ---- user + role ----
   const { currentUser } = useSelector(
     (state: RootState) => (state as any).accountReducer
   );
@@ -37,6 +37,10 @@ export default function Quizzes() {
   const items = useSelector((s: RootState) =>
     s.quizzesReducer.quizzes.filter((q) => q.course === cid)
   );
+
+  const visibleItems = isStudent
+    ? items.filter((q) => !!q.published)
+    : items;
 
   useEffect(() => {
     const load = async () => {
@@ -97,13 +101,19 @@ export default function Quizzes() {
           </span>
         </ListGroupItem>
 
-        {items.length === 0 && (
+        {visibleItems.length === 0 && (
           <ListGroupItem className="border-start border-end border-bottom">
-            No quizzes for this course yet. Click <b>+ Quiz</b> to add one.
+            {isStudent ? (
+              <>No quizzes are available for this course yet.</>
+            ) : (
+              <>
+                No quizzes for this course yet. Click <b>+ Quiz</b> to add one.
+              </>
+            )}
           </ListGroupItem>
         )}
 
-        {items.map((q: Quiz) => {
+        {visibleItems.map((q: Quiz) => {
           const quizHref = isStudent
             ? `/Courses/${cid}/Quizzes/${q._id}/Take`
             : `/Courses/${cid}/Quizzes/${q._id}`;
@@ -136,15 +146,19 @@ export default function Quizzes() {
               </div>
 
               <div className="d-flex align-items-center ms-3">
-                <Button
-                  size="sm"
-                  variant="outline-danger"
-                  className="me-2"
-                  onClick={() => handleDelete(q._id!)}
-                >
-                  Delete
-                </Button>
-                {q.published && <GreenCheckmark />}
+                {!isStudent && (
+                  <Button
+                    size="sm"
+                    variant="outline-danger"
+                    className="me-2"
+                    onClick={() => handleDelete(q._id!)}
+                  >
+                    Delete
+                  </Button>
+                )}
+
+                {q.published ? <GreenCheckmark /> : <UnpublishedIcon />}
+
                 <IoEllipsisVertical className="fs-4 ms-2" />
               </div>
             </ListGroupItem>

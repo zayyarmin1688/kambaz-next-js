@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/(Kambaz)/Courses/[cid]/Quizzes/[qid]/Preview/page.tsx
 "use client";
 
@@ -11,8 +12,10 @@ import type {
   QuizQuestion,
   QuizQuestionChoice,
 } from "../../reducer";
-
-type AnswersMap = Record<string, string | boolean>;
+import {
+  scoreQuestion,
+  type AnswersMap,
+} from "../quizScoring";
 
 export default function QuizPreviewPage() {
   const { cid, qid } = useParams<{ cid: string; qid: string }>();
@@ -29,7 +32,6 @@ export default function QuizPreviewPage() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // -------- load quiz --------
   useEffect(() => {
     const load = async () => {
       if (!qid) return;
@@ -54,47 +56,6 @@ export default function QuizPreviewPage() {
 
   const setAnswer = (questionId: string, value: string | boolean) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
-  };
-
-  // -------- scoring --------
-  const scoreQuestion = (
-    q: QuizQuestion,
-    ans: string | boolean | undefined
-  ) => {
-    // multiple choice: compare selected choice id to the correct one
-    if (
-      q.type === "multiple-choice" &&
-      Array.isArray(q.choices) &&
-      typeof ans === "string"
-    ) {
-      const correctChoice = (q.choices as QuizQuestionChoice[]).find(
-        (c) => c.correct
-      );
-      return !!correctChoice && correctChoice._id === ans;
-    }
-
-    // true / false
-    if (
-      q.type === "true-false" &&
-      typeof q.correctBoolean === "boolean" &&
-      typeof ans === "boolean"
-    ) {
-      return q.correctBoolean === ans;
-    }
-
-    // fill in the blank
-    if (
-      q.type === "fill-blank" &&
-      Array.isArray(q.correctAnswers) &&
-      typeof ans === "string"
-    ) {
-      const normalizedAns = ans.trim().toLowerCase();
-      return q.correctAnswers
-        .map((s) => s.trim().toLowerCase())
-        .includes(normalizedAns);
-    }
-
-    return false;
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -143,7 +104,6 @@ export default function QuizPreviewPage() {
   const currentQuestion =
     questions.length > 0 ? questions[currentIndex] : null;
 
-    // -------- render --------
   return (
     <div className="p-3">
       <div className="border rounded p-4 bg-white">
@@ -173,7 +133,6 @@ export default function QuizPreviewPage() {
             </Alert>
           )}
 
-          {/* ONE question card, similar to Canvas “Question 1  1 pts” box */}
           {currentQuestion && (
             <Card className="mb-3">
               <Card.Header className="d-flex justify-content-between align-items-center">
@@ -188,10 +147,9 @@ export default function QuizPreviewPage() {
                 {(() => {
                   const q = currentQuestion;
                   const value = answers[q._id];
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  const isCorrect = submitted && scoreQuestion(q, value as any);
+                  const isCorrect =
+                    submitted && scoreQuestion(q, value as any);
 
-                  // Multiple choice
                   if (q.type === "multiple-choice") {
                     return (
                       <>
@@ -204,7 +162,9 @@ export default function QuizPreviewPage() {
                                 name={q._id}
                                 label={opt.text}
                                 checked={value === opt._id}
-                                onChange={() => setAnswer(q._id, opt._id)}
+                                onChange={() =>
+                                  setAnswer(q._id, opt._id)
+                                }
                                 className="mb-1"
                               />
                             )
@@ -213,9 +173,13 @@ export default function QuizPreviewPage() {
                         {submitted && (
                           <div className="mt-2">
                             {isCorrect ? (
-                              <span className="text-success">✓ Correct</span>
+                              <span className="text-success">
+                                ✓ Correct
+                              </span>
                             ) : (
-                              <span className="text-danger">✗ Incorrect</span>
+                              <span className="text-danger">
+                                ✗ Incorrect
+                              </span>
                             )}
                           </div>
                         )}
@@ -223,7 +187,6 @@ export default function QuizPreviewPage() {
                     );
                   }
 
-                  // True / False
                   if (q.type === "true-false") {
                     return (
                       <>
@@ -247,9 +210,13 @@ export default function QuizPreviewPage() {
                         {submitted && (
                           <div className="mt-2">
                             {isCorrect ? (
-                              <span className="text-success">✓ Correct</span>
+                              <span className="text-success">
+                                ✓ Correct
+                              </span>
                             ) : (
-                              <span className="text-danger">✗ Incorrect</span>
+                              <span className="text-danger">
+                                ✗ Incorrect
+                              </span>
                             )}
                           </div>
                         )}
@@ -257,7 +224,6 @@ export default function QuizPreviewPage() {
                     );
                   }
 
-                  // Fill in the blank
                   if (q.type === "fill-blank") {
                     return (
                       <>
@@ -273,9 +239,13 @@ export default function QuizPreviewPage() {
                         {submitted && (
                           <div className="mt-2">
                             {isCorrect ? (
-                              <span className="text-success">✓ Correct</span>
+                              <span className="text-success">
+                                ✓ Correct
+                              </span>
                             ) : (
-                              <span className="text-danger">✗ Incorrect</span>
+                              <span className="text-danger">
+                                ✗ Incorrect
+                              </span>
                             )}
                           </div>
                         )}
@@ -289,7 +259,6 @@ export default function QuizPreviewPage() {
             </Card>
           )}
 
-          {/* bottom bar: “Keep Editing” + Submit / Reset, like Canvas */}
           {questions.length > 0 && (
             <>
               <div className="d-flex justify-content-between align-items-center mb-3">
@@ -319,7 +288,6 @@ export default function QuizPreviewPage() {
                 </div>
               </div>
 
-              {/* “Questions” list at the very bottom */}
               <div className="mt-3">
                 <h5 className="mb-2">Questions</h5>
                 {questions.map((q, idx) => (
@@ -345,4 +313,3 @@ export default function QuizPreviewPage() {
     </div>
   );
 }
-

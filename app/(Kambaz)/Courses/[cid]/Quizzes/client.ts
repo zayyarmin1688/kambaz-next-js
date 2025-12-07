@@ -66,12 +66,7 @@ export const createQuizAttempt = async (quizId: string, body: any) => {
   return response.json();
 };
 
-/**
- * Old name that Next is expecting.
- * We *ignore* the studentId parameter and just call the
- * /attempts/mine endpoint, since the backend uses the
- * logged-in user from the session.
- */
+
 export const findAttemptsForQuizAndStudent = async (
   quizId: string,
   _studentId: string
